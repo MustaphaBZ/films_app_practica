@@ -51,13 +51,29 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
         #falta codi
     
     def desa(self,pelicula:Pelicula) -> Pelicula:
-        pass
+        cursor = self._conn.cursor(buffered=True)
+        query = "INSERT INTO PELICULA (ID, TITULO, ANYO, PUNTUACION, VOTOS) VALUES (%s, %s, %s, %s, %s)"
+        val = (pelicula.id,pelicula.titol,pelicula.any,pelicula.puntuacio,pelicula.vots)
+        cursor.execute(query,val)
+        self._conn.commit()
+        
+        #pass
         #falta codi
     
     def llegeix(self, any: int) -> Pelicula:
-        pass
+        cursor = self._conn.cursor(buffered=True)
+        query = f"SELECT * FROM PELICULA WHERE ANYO = {any}"
+        cursor.execute(query)
+        myresult = cursor.fetchall()
+        for x in myresult:
+            print(x)
+        #pass
         #falta codi
     
     def canvia(self,pelicula:Pelicula) -> Pelicula:
-        pass
+        cursor = self._conn.cursor(buffered=True)
+        query = f"UPDATE PELICULA SET ID = {pelicula.id}, TITULO = {pelicula.titol}, ANYO = {pelicula.any}, PUNTUACION = {pelicula.puntuacio}, VOTOS = {pelicula.vots}"
+        cursor.execute(query)
+        self._conn.commit()
+        #pass
         #falta codi
