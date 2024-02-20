@@ -3,6 +3,8 @@
 import os, yaml, sys, time, json
 from persistencia_pelicula_mysql import Persistencia_pelicula_mysql
 from llistapelis import Llistapelis
+#from app_film import desa
+from pelicula import Pelicula
 import logging
 
 THIS_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -79,13 +81,14 @@ def mostra_menu_next10():
 def procesa_opcio(context):
     return {
         "0": lambda ctx : mostra_lent("Fins la propera"),
-        "1": lambda ctx : mostra_llista(ctx['llistapelis'])
+        "1": lambda ctx : mostra_llista(ctx['llistapelis']),
+        "2": lambda ctx : mostra_llista(ctx['llistapelisany'])
     }.get(context["opcio"], lambda ctx : mostra_lent("opcio incorrecta!!!"))(context)
 
 def database_read(id:int):
     logging.basicConfig(filename='pelicules.log', encoding='utf-8', level=logging.DEBUG)
-    la_meva_configuracio = get_configuracio()#falta codi
-    persistencies = get_persistencies()#falta codi
+    la_meva_configuracio = get_configuracio(RUTA_FITXER_CONFIGURACIO)#falta codi
+    persistencies = get_persistencies(la_meva_configuracio)#falta codi
     films = Llistapelis(
         persistencia_pelicula=persistencies
     )
@@ -100,6 +103,8 @@ def bucle_principal(context):
     while opcio != '0':
         opcio = input("Selecciona una opció: ")
         context["opcio"] = opcio
+        #la_meva_configuracio = get_configuracio(RUTA_FITXER_CONFIGURACIO)
+        #persistencies = get_persistencies(la_meva_configuracio)
         
         if context["opcio"] == '1':
             id = None
@@ -107,9 +112,24 @@ def bucle_principal(context):
             context["llistapelis"] = films
 
         elif context["opcio"] == '2':
-            pass
+            any = input("Introdueix l'any: ")
+            id = None
+            films = database_read(id)
+            films.lany(any)
+            context["llistapelisany"] = films
+            
         elif context["opcio"] == '3':
-            pass
+            #id = input("Introdueix l'id: ")
+            titol = input("Introdueix el titol: ")
+            any = input("Introdueix l'any: ")
+            puntuacio = input("Puntuació: ")
+            vots = input("Numero de vots: ")
+
+            nueva_peli = Pelicula(titol, any, puntuacio, vots, Persistencia_pelicula_mysql)
+            
+            Persistencia_pelicula_mysql.desa(nueva_peli)
+            
+
         elif context["opcio"] == '4':
             pass
             #falta codi
@@ -120,7 +140,8 @@ def bucle_principal(context):
 
 def main():
     context = {
-        "llistapelis": None
+        "llistapelis": None,
+        "llistapelisany": None
     }
     landing_text()
     bucle_principal(context)

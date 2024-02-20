@@ -6,8 +6,10 @@ from typing  import List
 import mysql.connector
 import logging
 
+
 class Persistencia_pelicula_mysql(IPersistencia_pelicula):
     def __init__(self, credencials) -> None:
+        
         self._credencials = credencials
         self._conn = mysql.connector.connect(
                 host=credencials["host"],
@@ -52,8 +54,8 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
     
     def desa(self,pelicula:Pelicula) -> Pelicula:
         cursor = self._conn.cursor(buffered=True)
-        query = "INSERT INTO PELICULA (ID, TITULO, ANYO, PUNTUACION, VOTOS) VALUES (%s, %s, %s, %s, %s)"
-        val = (pelicula.id,pelicula.titol,pelicula.any,pelicula.puntuacio,pelicula.vots)
+        query = "INSERT INTO PELICULA (TITULO, ANYO, PUNTUACION, VOTOS) VALUES (%s, %s, %s, %s)"
+        val = (pelicula.titol,pelicula.any,pelicula.puntuacio,pelicula.vots)
         cursor.execute(query,val)
         self._conn.commit()
         
