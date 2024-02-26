@@ -48,14 +48,33 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
             resultat.append(pelicula)
         return resultat
     
-    def totes_pag(self, id=None) -> List[Pelicula]:
-        pass
+    #def totes_pag(self, id=None) -> List[Pelicula]:
+        #pass
         #falta codi
     
+    def totes_pag(self, id=None) -> List[Pelicula]:
+        cursor = self._conn.cursor(buffered=True)
+        if id is None:
+            query = "SELECT id, titulo, anyo, puntuacion, votos FROM PELICULA ORDER BY id LIMIT 10;"
+            cursor.execute(query)
+        else:
+            query = f"SELECT id, titulo, anyo, puntuacion, votos FROM PELICULA WHERE id > {id} ORDER BY id LIMIT 10;"
+            cursor.execute(query)
+        registres = cursor.fetchall()
+        cursor.reset()
+        resultat = []
+        for registre in registres:
+            pelicula = Pelicula(registre[1], registre[2], registre[3], registre[4], self, registre[0])
+            resultat.append(pelicula)
+        return resultat
+
+
+
+
     def desa(self,pelicula:Pelicula) -> Pelicula:
         cursor = self._conn.cursor(buffered=True)
-        query = "INSERT INTO PELICULA (TITULO, ANYO, PUNTUACION, VOTOS) VALUES (%s, %s, %s, %s)"
-        val = (pelicula.titol,pelicula.any,pelicula.puntuacio,pelicula.vots)
+        query = "INSERT INTO PELICULA (ID, TITULO, ANYO, PUNTUACION, VOTOS) VALUES (%s, %s, %s, %s, %s)"
+        val = (pelicula.id, pelicula.titol,pelicula.any,pelicula.puntuacio,pelicula.vots)
         cursor.execute(query,val)
         self._conn.commit()
         

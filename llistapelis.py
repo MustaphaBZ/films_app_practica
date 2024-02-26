@@ -36,8 +36,12 @@ class Llistapelis():
         return json.dumps(self_dict)
 
     def llegeix_de_disc(self,id:int):
-        self._pelicules = self.persistencia_pelicula.totes_pag(id) #falta codi
-        self._ult_id = id #falta codi
+        self._pelicules = self.persistencia_pelicula['pelicula'].totes_pag(id) #falta codi
+        #self._ult_id = id #falta codi
 
     def lany(self, any :int):
-        self._pelicules = self.persistencia_pelicula.llegeix(any)
+        self._pelicules = self.persistencia_pelicula['pelicula'].llegeix(any)
+
+    def afegir(self,id:int, titol: str, any: int, puntuacio:float, vots:int ):
+        pelicula = Pelicula(titol, any, puntuacio, vots, None, id)
+        self._pelicules = self.persistencia_pelicula['pelicula'].desa(pelicula)
