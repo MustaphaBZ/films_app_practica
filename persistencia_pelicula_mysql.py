@@ -48,26 +48,22 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
             resultat.append(pelicula)
         return resultat
     
-    #def totes_pag(self, id=None) -> List[Pelicula]:
-        #pass
-        #falta codi
     
     def totes_pag(self, id=None) -> List[Pelicula]:
         cursor = self._conn.cursor(buffered=True)
-        if id is None:
-            query = "SELECT id, titulo, anyo, puntuacion, votos FROM PELICULA ORDER BY id LIMIT 10;"
-            cursor.execute(query)
-        else:
-            query = f"SELECT id, titulo, anyo, puntuacion, votos FROM PELICULA WHERE id > {id} ORDER BY id LIMIT 10;"
-            cursor.execute(query)
+        
+        query = f"SELECT * FROM PELICULA WHERE ID >= {id} ORDER BY ID LIMIT 10"
+        cursor.execute(query)
+        
         registres = cursor.fetchall()
-        cursor.reset()
+        
         resultat = []
         for registre in registres:
             pelicula = Pelicula(registre[1], registre[2], registre[3], registre[4], self, registre[0])
             resultat.append(pelicula)
+        logging.info(f"S'ha rebut 10 pel·lícules a partir d'aquesta id: {pelicula.id}")  
         return resultat
-
+        
 
 
 
@@ -77,24 +73,25 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
         val = (pelicula.id, pelicula.titol,pelicula.any,pelicula.puntuacio,pelicula.vots)
         cursor.execute(query,val)
         self._conn.commit()
+        logging.info(f"S'ha afegit la pel·licula: {pelicula.id}")  
         
-        #pass
-        #falta codi
     
-    def llegeix(self, any: int) -> Pelicula:
+    def llegeix(self, any: int) -> List[Pelicula]:
         cursor = self._conn.cursor(buffered=True)
-        query = f"SELECT * FROM PELICULA WHERE ANYO = {any}"
-        cursor.execute(query)
-        myresult = cursor.fetchall()
-        for x in myresult:
-            print(x)
-        #pass
-        #falta codi
+        
+        cursor.execute(f"SELECT * FROM PELICULA WHERE ANYO = {any}")
+        registres = cursor.fetchall()
+       
+        for registre in registres:
+            print(registre)
+        logging.info(f"Lectura de les pel·lícules d'aquest any: {any}")  
+        
     
-    def canvia(self,pelicula:Pelicula) -> Pelicula:
+    def canvia(self, pelicula: Pelicula) -> Pelicula:
         cursor = self._conn.cursor(buffered=True)
-        query = f"UPDATE PELICULA SET ID = {pelicula.id}, TITULO = {pelicula.titol}, ANYO = {pelicula.any}, PUNTUACION = {pelicula.puntuacio}, VOTOS = {pelicula.vots}"
-        cursor.execute(query)
+        query = "UPDATE PELICULA SET TITULO = %s, ANYO = %s, PUNTUACION = %s, VOTOS = %s WHERE ID = %s"
+        values = (pelicula.titol, pelicula.any, pelicula.puntuacio, pelicula.vots, pelicula.id)
+        cursor.execute(query, values)
         self._conn.commit()
-        #pass
-        #falta codi
+        logging.info(f"Modificació de la pel·lícula: {pelicula.id}")  
+        
